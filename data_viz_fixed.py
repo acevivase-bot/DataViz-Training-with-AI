@@ -240,6 +240,44 @@ def get_perplexity_response(prompt, data_context="", api_key="", model="llama-3.
     except Exception as e:
         return f"❌ Error Perplexity: {str(e)}"
 
+def create_visualization(data, graph_type, x_axis, y_axis, color=None, size=None, facet_col=None):
+    """Create visualization based on parameters"""
+    try:
+        if graph_type == 'line':
+            fig = px.line(data_frame=data, x=x_axis, y=y_axis, color=color, markers=True, 
+                         template='plotly_white', title=f"{graph_type.title()} Chart: {x_axis} vs {y_axis}")
+        elif graph_type == 'bar':
+            fig = px.bar(data_frame=data, x=x_axis, y=y_axis, color=color, facet_col=facet_col,
+                        barmode='group', template='plotly_white', title=f"{graph_type.title()} Chart: {x_axis} vs {y_axis}")
+        elif graph_type == 'scatter':
+            fig = px.scatter(data_frame=data, x=x_axis, y=y_axis, color=color, size=size,
+                           template='plotly_white', title=f"{graph_type.title()} Plot: {x_axis} vs {y_axis}")
+        elif graph_type == 'pie':
+            fig = px.pie(data_frame=data, values=y_axis, names=x_axis, 
+                        template='plotly_white', title=f"{graph_type.title()} Chart: {x_axis}")
+        elif graph_type == 'histogram':
+            fig = px.histogram(data_frame=data, x=x_axis, color=color, 
+                             template='plotly_white', title=f"Histogram: {x_axis}")
+        elif graph_type == 'box':
+            fig = px.box(data_frame=data, x=x_axis, y=y_axis, color=color,
+                        template='plotly_white', title=f"Box Plot: {x_axis} vs {y_axis}")
+        else:
+            return None
+
+        # Update layout
+        fig.update_layout(
+            font=dict(size=12),
+            title_font_size=16,
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+        )
+
+        return fig
+
+    except Exception as e:
+        st.error(f"Error creating visualization: {e}")
+        return None
+
+
 # ============= MAIN APPLICATION =============
 def main():
     # Initialize session management
