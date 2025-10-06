@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -383,9 +384,111 @@ def main():
                 }).sort_values('Null Count', ascending=False)
                 st.dataframe(null_df, use_container_width=True)
 
+            # ============= COLUMN VALUE COUNTS =============
+            st.markdown("### 📊 Column Values Analysis")
+            with st.expander('🔍 Value Count Analysis', expanded=False):
+                col1, col2 = st.columns(2)
+                with col1:
+                    column = st.selectbox('Choose Column:', options=list(data.columns))
+                with col2:
+                    top_rows = st.number_input('Top rows to show:', min_value=1, value=10, step=1)
+
+                if st.button("📊 Analyze Values", use_container_width=True):
+                    if data[column].dtype == 'object' or data[column].nunique() < 50:
+                        result = data[column].value_counts().reset_index().head(top_rows)
+                        result.columns = [column, 'count']
+
+                        st.dataframe(result, use_container_width=True)
+
+                        # Quick visualizations
+                        col1, col2, col3 = st.columns(3)
+
+                        with col1:
+                            st.markdown("#### 📊 Bar Chart")
+                            fig_bar = px.bar(result, x=column, y='count', template='plotly_white')
+                            st.plotly_chart(fig_bar, use_container_width=True)
+
+                        with col2:
+                            st.markdown("#### 📈 Line Chart")  
+                            fig_line = px.line(result, x=column, y='count', markers=True, template='plotly_white')
+                            st.plotly_chart(fig_line, use_container_width=True)
+
+                        with col3:
+                            st.markdown("#### 🥧 Pie Chart")
+                            fig_pie = px.pie(result, names=column, values='count', template='plotly_white')
+                            st.plotly_chart(fig_pie, use_container_width=True)
+                    else:
+                        st.info(f"Column '{column}' has too many unique values ({data[column].nunique()}). Showing distribution instead.")
+                        fig_hist = px.histogram(data, x=column, template='plotly_white')
+                        st.plotly_chart(fig_hist, use_container_width=True)
+
+
             # ============= VISUALIZATION SECTION (SHORTENED FOR BREVITY) =============
             st.markdown("### 📈 Advanced Data Visualization")
             st.info("Visualization builder section here...")
+            # Manual Visualization Builder
+            with st.expander("🎨 Custom Visualization Builder", expanded=True):
+                # Graph type selection
+                col1, col2 = st.columns(2)
+
+                with col1:
+                    graph_type = st.selectbox(
+                        'Choose your graph:',
+                        options=['line', 'bar', 'scatter', 'pie', 'histogram', 'box'],
+                        format_func=lambda x: f"📊 {x.title()} Chart" if x != 'scatter' else "🔍 Scatter Plot"
+                    )
+
+                with col2:
+                    if graph_type in ['line', 'bar', 'scatter', 'box']:
+                        x_axis = st.selectbox('Choose X axis:', options=list(data.columns))
+                    elif graph_type == 'histogram':
+                        x_axis = st.selectbox('Choose Column:', options=list(data.columns))
+                    else:  # pie
+                        x_axis = st.selectbox('Choose Category Column:', options=list(data.columns))
+
+                # Y-axis selection (when needed)
+                if graph_type in ['line', 'bar', 'scatter', 'box']:
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        numeric_columns = data.select_dtypes(include=[np.number]).columns.tolist()
+                        y_axis = st.selectbox('Choose Y axis:', options=numeric_columns if numeric_columns else list(data.columns))
+
+                    with col2:
+                        color_options = [None] + list(data.columns)
+                        color = st.selectbox('Color Information:', options=color_options)
+                elif graph_type == 'pie':
+                    numeric_columns = data.select_dtypes(include=[np.number]).columns.tolist()
+                    y_axis = st.selectbox('Choose Values Column:', options=numeric_columns if numeric_columns else list(data.columns))
+                    color = None
+                else:  # histogram
+                    y_axis = None
+                    color_options = [None] + list(data.columns)
+                    color = st.selectbox('Color Information:', options=color_options)
+
+                # Generate visualization
+                if st.button("🚀 Generate Visualization", use_container_width=True):
+                    with st.spinner("Creating visualization..."):
+                        if graph_type in ['line', 'bar', 'scatter', 'box'] and y_axis is None:
+                            st.error("Please select a Y-axis column.")
+                        elif graph_type == 'pie' and y_axis is None:
+                            st.error("Please select a values column for pie chart.")
+                        else:
+                            # Prepare data for visualization
+                            viz_data = data.copy()
+
+                            # For categorical analysis, use value counts
+                            if graph_type in ['bar', 'line', 'pie'] and data[x_axis].dtype == 'object':
+                                if graph_type == 'pie':
+                                    viz_data = data[x_axis].value_counts().reset_index()
+                                    viz_data.columns = [x_axis, 'count']
+                                    y_axis = 'count'
+
+                            fig = create_visualization(viz_data, graph_type, x_axis, y_axis, color)
+
+                            if fig:
+                                st.plotly_chart(fig, use_container_width=True)
+                            else:
+                                st.error("Could not generate visualization. Please check your data and selections.")
 
             # ============= AI CHATBOT SECTION - WITH IMPROVED HISTORY MANAGEMENT =============
             st.markdown("### 🤖 AI Data Assistant")
