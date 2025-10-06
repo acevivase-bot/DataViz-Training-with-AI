@@ -256,7 +256,7 @@ def main():
 
     # API Provider Selection
     api_provider = st.sidebar.selectbox(
-        "🎯 Choose AI Provider:",
+        "Choose AI Provider:",
         ["OpenAI", "Perplexity"]
     )
 
@@ -322,8 +322,8 @@ def main():
             st.markdown("### 📊 Basic Information about the Dataset")
 
             tab1, tab2, tab3, tab4, tab5 = st.tabs([
-                '📈 Summary', '⬆️⬇️ Top and Bottom Rows', 
-                '🏷️ Data Types', '📋 Columns', '❓ Null Values'
+                '📈 Summary', 'Top and Bottom Rows', 
+                '🏷️ Data Types', 'Columns', 'Null Values'
             ])
 
             with tab1:
@@ -346,16 +346,16 @@ def main():
                     st.info("No numeric columns found for statistical summary.")
 
             with tab2:
-                st.markdown("#### ⬆️ Top Rows")
+                st.markdown("#### Top Rows")
                 top_rows = st.slider('Number of top rows:', 1, min(data.shape[0], 100), 5, key='top')
                 st.dataframe(data.head(top_rows), use_container_width=True)
 
-                st.markdown("#### ⬇️ Bottom Rows") 
+                st.markdown("#### Bottom Rows") 
                 bottom_rows = st.slider('Number of bottom rows:', 1, min(data.shape[0], 100), 5, key='bottom')
                 st.dataframe(data.tail(bottom_rows), use_container_width=True)
 
             with tab3:
-                st.markdown("#### 🏷️ Data Types of Columns")
+                st.markdown("#### Data Types of Columns")
                 dtype_df = pd.DataFrame({
                     'Column': data.dtypes.index,
                     'Data Type': data.dtypes.values,
@@ -365,7 +365,7 @@ def main():
                 st.dataframe(dtype_df, use_container_width=True)
 
             with tab4:
-                st.markdown("#### 📋 Column Names")
+                st.markdown("#### Column Names")
                 cols_df = pd.DataFrame({
                     'Index': range(len(data.columns)),
                     'Column Name': data.columns,
@@ -384,7 +384,7 @@ def main():
 
             # ============= COLUMN VALUE COUNTS =============
             st.markdown("### 📊 Column Values Analysis")
-            with st.expander('🔍 Value Count Analysis', expanded=False):
+            with st.expander('Value Count Analysis', expanded=False):
                 col1, col2 = st.columns(2)
                 with col1:
                     column = st.selectbox('Choose Column:', options=list(data.columns))
@@ -492,15 +492,15 @@ def main():
 
             # AI Visualization Recommendations
             if api_key:
-                with st.expander("🤖 AI Visualization Recommendations", expanded=False):
-                    if st.button("🎯 Get AI Recommendations for Best Charts", use_container_width=True):
+                with st.expander("AI Visualization Recommendations", expanded=False):
+                    if st.button("Get AI Recommendations for Best Charts", use_container_width=True):
                         with st.spinner(f"🤖 {api_provider} is analyzing your data for visualization recommendations..."):
                             recommendation = get_ai_viz_recommendation(data, api_provider, api_key, model)
-                            st.markdown("#### 🎨 AI Recommendations")
+                            st.markdown("#### AI Recommendations")
                             st.markdown(recommendation)
 
             # Manual Visualization Builder
-            with st.expander("🎨 Custom Visualization Builder", expanded=True):
+            with st.expander("Custom Visualization Builder", expanded=True):
                 # Graph type selection
                 col1, col2 = st.columns(2)
 
