@@ -2,6 +2,6 @@ streamlit
 pandas
 plotly
 numpy
-openai
+openai>=1.0.0
 requests
 openpyxl
