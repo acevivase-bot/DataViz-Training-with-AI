@@ -120,6 +120,15 @@ st.markdown("""
         font-size: 0.9rem;
         margin: 1rem 0;
     }
+        .creator-info {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+        text-align: center;
+    }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -331,6 +340,16 @@ def main():
 
     st.sidebar.markdown("---")
 
+    # Creator information at bottom of sidebar
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("""
+    <div class="creator-info">
+    <h4>👨‍💻 Creator Information</h4>
+    <p><strong>Created by:</strong> Vito Devara</p>
+    <p><strong>Phone:</strong> 081259795994</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
     # ============= FILE UPLOAD =============
     st.markdown("### 📤 Upload Your Dataset")
 
